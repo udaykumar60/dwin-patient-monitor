@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "DGUS virtual screen (auto COM)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "List COM ports",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "args": ["--list-ports"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Create com0com COM10-COM11",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "args": ["--setup-ports"],
+            "console": "integratedTerminal"
+        }
+    ]
+}
