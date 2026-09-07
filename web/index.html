@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="room">
+      <div class="bezel" id="bezel">
+        <div class="bezel-brand">
+          <span>DWIN DGUS</span>
+          <span>DMG12800C121</span>
+          <span>12.1″ 1280×800</span>
+        </div>
+        <div class="glass">
+          <section class="page page-home" id="page-home" data-page="home">
+            <div class="home-pulse" aria-hidden="true"></div>
+            <p class="home-kicker">Bedside vital signs station</p>
+            <h1>PATIENT MONITOR</h1>
+            <p class="home-welcome">Welcome to Patient Monitor</p>
+            <p class="home-sub">
+              ECG &nbsp;·&nbsp; RESP &nbsp;·&nbsp; SpO2 &nbsp;·&nbsp; TEMP &nbsp;·&nbsp; NIBP
+            </p>
+            <button class="home-start" id="btn-start" type="button">
+              Start monitoring
+            </button>
+            <p class="home-hint">UART 115200 8N1 &nbsp;·&nbsp; Press Enter</p>
+          </section>
+
+          <section class="page page-dash hidden" id="page-dash" data-page="dash">
+            <header class="topbar">
+              <div>
+                <h2>PATIENT MONITOR</h2>
+                <p>DWIN DGUS &nbsp;·&nbsp; ECG / RESP / SpO2 &nbsp;·&nbsp; UART 115200 8N1</p>
+              </div>
+              <div class="topbar-meta">
+                <div>
+                  <span class="meta-label">PATIENT</span>
+                  <strong>DEMO-0001</strong>
+                </div>
+                <div>
+                  <span class="meta-label">BED</span>
+                  <strong>ICU-04</strong>
+                </div>
+                <div>
+                  <span class="meta-label">CLOCK</span>
+                  <strong id="clock">--:--:--</strong>
+                </div>
+                <div class="live-pill">
+                  <i id="live-dot"></i>
+                  <span>DWIN PANEL</span>
+                </div>
+              </div>
+            </header>
+
+            <main class="dash-grid">
+              <article class="lane" data-lane="ecg">
+                <div class="lane-head">
+                  <span class="lane-title ecg">ECG</span>
+                  <span class="lane-hint">Real-time curve CH0 &nbsp; 0x84</span>
+                </div>
+                <canvas id="wave-ecg" width="860" height="128"></canvas>
+              </article>
+              <article class="vital vital-hr">
+                <span class="vital-label">HEART RATE</span>
+                <div class="vital-row">
+                  <strong id="val-hr">---</strong>
+                  <span>BPM</span>
+                </div>
+                <span class="vital-vp">VP 0x5000</span>
+              </article>
+
+              <article class="lane" data-lane="resp">
+                <div class="lane-head">
+                  <span class="lane-title resp">RESP</span>
+                  <span class="lane-hint">Real-time curve CH1 &nbsp; 0x84</span>
+                </div>
+                <canvas id="wave-resp" width="860" height="128"></canvas>
+              </article>
+              <article class="vital vital-rr">
+                <span class="vital-label">RESP</span>
+                <div class="vital-row">
+                  <strong id="val-rr">--</strong>
+                  <span>/min</span>
+                </div>
+                <span class="vital-vp">VP 0x5005</span>
+              </article>
+
+              <article class="lane" data-lane="spo2">
+                <div class="lane-head">
+                  <span class="lane-title spo2">SpO2</span>
+                  <span class="lane-hint">Real-time curve CH2 &nbsp; 0x84</span>
+                </div>
+                <canvas id="wave-spo2" width="860" height="128"></canvas>
+              </article>
+              <article class="vital vital-spo2">
+                <span class="vital-label">SpO2</span>
+                <div class="vital-row">
+                  <strong id="val-spo2">---</strong>
+                  <span>%</span>
+                </div>
+                <span class="vital-vp">VP 0x5001</span>
+              </article>
+
+              <div class="bottom-vitals" id="bottom-vitals">
+                <article class="status-card" id="status-card">
+                  <span class="vital-label">STATUS</span>
+                  <strong id="val-status">Waiting for MCU / Python host…</strong>
+                  <p>Text VP 0x5100 &nbsp;·&nbsp; Same frames as the DWIN panel</p>
+                </article>
+                <article class="mini vital-temp">
+                  <span class="vital-label">TEMP</span>
+                  <strong id="val-temp">--.-</strong>
+                  <span class="mini-unit">°C &nbsp; VP 0x5002</span>
+                </article>
+                <article class="mini vital-nibp">
+                  <span class="vital-label">NIBP</span>
+                  <strong id="val-nibp">---</strong>
+                  <span class="mini-unit">mmHg &nbsp; VP 0x5003</span>
+                </article>
+              </div>
+            </main>
+
+            <footer class="dock">
+              <button class="dock-btn active" type="button" data-go="dash">Page 0  Dashboard</button>
+              <button class="dock-btn" type="button" data-go="system">Page 1  System</button>
+              <button class="dock-btn" type="button" data-go="home">Standby</button>
+              <p class="dock-note">
+                Place Real-time Curve controls on the 3 lanes and Data Variable Display on the number boxes.
+              </p>
+            </footer>
+          </section>
+
+          <section class="page page-system hidden" id="page-system" data-page="system">
+            <header class="topbar">
+              <div>
+                <h2>SYSTEM / DUMP</h2>
+                <p>Page 1 &nbsp;·&nbsp; how this project reaches a real DWIN screen</p>
+              </div>
+              <div class="live-pill">
+                <i class="ok"></i>
+                <span>HOST READY</span>
+              </div>
+            </header>
+            <article class="system-card">
+              <span class="vital-label">DETAIL LINE</span>
+              <strong id="val-detail">TX 00000 &nbsp; PAGE 1 &nbsp; WEB HOST</strong>
+              <p class="vp-note">Text VP 0x5200</p>
+              <ol class="system-steps">
+                <li>Same UART protocol on this web preview and on the purchased DWIN panel: 5A A5 82 / 84.</li>
+                <li>In DGUS: File → Generate. Copy the DWIN_SET folder to an SD card (root).</li>
+                <li>Power off the DWIN, insert the card, power on. The screen loads this project.</li>
+                <li>Wire the main MCU: TX → DWIN RX, RX → DWIN TX, GND. 115200 8N1.</li>
+                <li>MCU writes VP 0x5000–0x5005 from probes, and 0x84 curve samples for ECG / RESP / SpO2.</li>
+                <li>This browser page is a stand-in for the glass. Replace the demo stream with live probe data.</li>
+              </ol>
+            </article>
+            <footer class="dock">
+              <button class="dock-btn" type="button" data-go="dash">Page 0  Dashboard</button>
+              <button class="dock-btn active" type="button" data-go="system">Page 1  System</button>
+              <button class="dock-btn" type="button" data-go="home">Standby</button>
+            </footer>
+          </section>
+        </div>
+      </div>
+    </div>
+    <button class="scroll-fab" id="scroll-more" type="button" hidden aria-label="Show more">
+      <span aria-hidden="true">↓</span>
+      <small>More</small>
+    </button>
+    <script src="monitor.js"></script>
+  </body>
+</html>
